@@ -1,0 +1,14 @@
+{
+  "name": "todoapp",
+  "version": "1.0.0",
+  "description": "1. Install serverless  2. Create project \"sls create --template aws-nodejs --path toDoApp\"  3. Set up serverless offline to run project locally",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless-offline": "^8.1.0"
+  }
+}
