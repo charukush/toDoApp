@@ -51,6 +51,14 @@ functions:
           path: /user
           method: put
 
+  checkUser:
+    handler: user.checkUser
+
+    events:
+      - httpApi:
+          path: /user/{id}
+          method: get       
+
 resources: # CloudFormation template syntax from here on.
   Resources:
     usersTable:

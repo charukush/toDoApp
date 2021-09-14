@@ -1,6 +1,8 @@
 'use strict';
 var AWS = require('aws-sdk');
 var docClient = new AWS.DynamoDB.DocumentClient();
+
+//Create User  
 module.exports.createUser = async (event) => {
     var body = event.body;
     var parseBody = JSON.parse(body);
@@ -25,4 +27,24 @@ module.exports.createUser = async (event) => {
     };
   
     
+  };
+
+// Check User Id
+  module.exports.checkUser = async (event) => {
+      var id = event.pathParameters.id;
+      var param = {
+          TableName: "todo-user",
+          Key : {
+              "id" : id
+          }
+      }
+      var resp = await docClient.get(param).promise();
+    return {
+      statusCode: 200,
+      body: JSON.stringify(
+        {
+          resp
+            },
+      ),
+    };
   };
