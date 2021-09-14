@@ -10,4 +10,10 @@
 
  # Deploy project on git
   1. create a new repository in your git account
-  2.                             
+  2. follow the existing command.
+
+  # Deploy project on AWS
+   1. Go to amazon console - login
+   2. Setup aws keys 
+   3. sls deploy
+                          
