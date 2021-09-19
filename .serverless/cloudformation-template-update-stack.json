@@ -83,6 +83,12 @@
         "LogGroupName": "/aws/lambda/todoapp-dev-createUser"
       }
     },
+    "GetUserLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/todoapp-dev-getUser"
+      }
+    },
     "IamRoleLambdaExecution": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -180,7 +186,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/todoapp/dev/1631638444487-2021-09-14T16:54:04.487Z/todoapp.zip"
+          "S3Key": "serverless/todoapp/dev/1632080278704-2021-09-19T19:37:58.704Z/todoapp.zip"
         },
         "Handler": "handler.hello",
         "Runtime": "nodejs12.x",
@@ -205,7 +211,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/todoapp/dev/1631638444487-2021-09-14T16:54:04.487Z/todoapp.zip"
+          "S3Key": "serverless/todoapp/dev/1632080278704-2021-09-19T19:37:58.704Z/todoapp.zip"
         },
         "Handler": "user.createUser",
         "Runtime": "nodejs12.x",
@@ -223,24 +229,59 @@
         "CreateUserLogGroup"
       ]
     },
-    "HelloLambdaVersionKsdYxDHRLWKrDoQRZtzQUqihDK2FIxMhBPQyPW5gc": {
+    "GetUserLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/todoapp/dev/1632080278704-2021-09-19T19:37:58.704Z/todoapp.zip"
+        },
+        "Handler": "user.getUser",
+        "Runtime": "nodejs12.x",
+        "FunctionName": "todoapp-dev-getUser",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "GetUserLogGroup"
+      ]
+    },
+    "HelloLambdaVersionl6NAJTJVpk8buTpWjIcvfH6iOJBYCC4ZPstHyNfBLaw": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "HelloLambdaFunction"
         },
-        "CodeSha256": "/M8SSTUItPkvSXUe7i8k1LL5zTc/IktvIx/3JJfrKD4="
+        "CodeSha256": "UUFQUwwm1btH5ynDOiNXS8VQhE971ITtoM+o/7j4Wp0="
       }
     },
-    "CreateUserLambdaVersion2CgaK6hXDQpykWhLNMiJjyC2UNtR2suHfs2VhWFq1U": {
+    "CreateUserLambdaVersionNOXYP9JJppQC9iZlDOMLF0QJp8xfDIyICwJmuR9V4xQ": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "CreateUserLambdaFunction"
         },
-        "CodeSha256": "/M8SSTUItPkvSXUe7i8k1LL5zTc/IktvIx/3JJfrKD4="
+        "CodeSha256": "UUFQUwwm1btH5ynDOiNXS8VQhE971ITtoM+o/7j4Wp0="
+      }
+    },
+    "GetUserLambdaVersionxL8qUXhm6vHB0jwhyZdM8FyMvWM5Vo6Ci2uxQ2MckY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GetUserLambdaFunction"
+        },
+        "CodeSha256": "UUFQUwwm1btH5ynDOiNXS8VQhE971ITtoM+o/7j4Wp0="
       }
     },
     "HttpApi": {
@@ -413,6 +454,81 @@
       },
       "DependsOn": "HttpApiIntegrationCreateUser"
     },
+    "GetUserLambdaPermissionHttpApi": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "GetUserLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "HttpApi"
+              },
+              "/*"
+            ]
+          ]
+        }
+      }
+    },
+    "HttpApiIntegrationGetUser": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::GetAtt": [
+            "GetUserLambdaFunction",
+            "Arn"
+          ]
+        },
+        "PayloadFormatVersion": "2.0",
+        "TimeoutInMillis": 6500
+      }
+    },
+    "HttpApiRouteGetUserIdVar": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "GET /user/{id}",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationGetUser"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationGetUser"
+    },
     "usersTable": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
@@ -448,7 +564,7 @@
     "HelloLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "HelloLambdaVersionKsdYxDHRLWKrDoQRZtzQUqihDK2FIxMhBPQyPW5gc"
+        "Ref": "HelloLambdaVersionl6NAJTJVpk8buTpWjIcvfH6iOJBYCC4ZPstHyNfBLaw"
       },
       "Export": {
         "Name": "sls-todoapp-dev-HelloLambdaFunctionQualifiedArn"
@@ -457,10 +573,19 @@
     "CreateUserLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "CreateUserLambdaVersion2CgaK6hXDQpykWhLNMiJjyC2UNtR2suHfs2VhWFq1U"
+        "Ref": "CreateUserLambdaVersionNOXYP9JJppQC9iZlDOMLF0QJp8xfDIyICwJmuR9V4xQ"
       },
       "Export": {
         "Name": "sls-todoapp-dev-CreateUserLambdaFunctionQualifiedArn"
+      }
+    },
+    "GetUserLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "GetUserLambdaVersionxL8qUXhm6vHB0jwhyZdM8FyMvWM5Vo6Ci2uxQ2MckY"
+      },
+      "Export": {
+        "Name": "sls-todoapp-dev-GetUserLambdaFunctionQualifiedArn"
       }
     },
     "HttpApiId": {

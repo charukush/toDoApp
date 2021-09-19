@@ -50,14 +50,16 @@ functions:
       - httpApi:
           path: /user
           method: put
+          cors: true
 
-  checkUser:
-    handler: user.checkUser
+  getUser:
+    handler: user.getUser
 
     events:
       - httpApi:
           path: /user/{id}
-          method: get       
+          method: get
+          cors: true     
 
 resources: # CloudFormation template syntax from here on.
   Resources:

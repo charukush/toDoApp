@@ -16,4 +16,13 @@
    1. Go to amazon console - login
    2. Setup aws keys 
    3. sls deploy
+
+
+# AWS url
+
+GET - https://devahhm20j.execute-api.us-east-1.amazonaws.com/health
+
+PUT - https://devahhm20j.execute-api.us-east-1.amazonaws.com/user
+
+GET - https://devahhm20j.execute-api.us-east-1.amazonaws.com/user/{id}
                           
